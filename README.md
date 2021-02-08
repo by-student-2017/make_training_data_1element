@@ -80,7 +80,7 @@
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
-	!cat ./dftb/config_potfit*
+	!cat config_potfit*
 
 
 # Google Colaboratory
@@ -121,4 +121,4 @@
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
-	!cat ./dftb/config_potfit*
+	!cat config_potfit*
