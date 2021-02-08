@@ -76,7 +76,7 @@
 ## Run
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
-	!python2 mkdata.py
+	!python2 mkdata_gc.py
 	!cat ./dftb/config_potfit*
 
 
@@ -114,5 +114,5 @@
 	
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
-	!python2 mkdata.py
+	!python2 mkdata_gc.py
 	!cat ./dftb/config_potfit*
