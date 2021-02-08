@@ -106,21 +106,28 @@ for t in temp:
     toten = float(toten_per_atom) * float(natom)
     print "    Total energy, TE: "+str(toten)+" [eV]"
     commands.getoutput("echo "+str(toten)+"  "+str(vp)+" >> toten-"+str(satom)+".ml.dat")
+    #
     vp = float(vp)*100.0
     if (vp < 10.0):
       commands.getoutput("mkdir "+str(vp)[0:1].zfill(3))
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:1].zfill(3)+"/pw.scf.in")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:1].zfill(3)+"/pw.out")
       commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:1].zfill(3)+"/POS.gen")
       commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:1].zfill(3)+"/POSCAR")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:1].zfill(3)+"/"+str(new_name)+".cif")
       commands.getoutput("mv "+str(vp)[0:1].zfill(3)+" ./"+str(satom)+".mol-evol/"+str(vp)[0:1].zfill(3))
     elif (vp < 100.0):
       commands.getoutput("mkdir "+str(vp)[0:2].zfill(3))
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:2].zfill(3)+"/pw.scf.in")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:2].zfill(3)+"/pw.out")
       commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:2].zfill(3)+"/POS.gen")
       commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:2].zfill(3)+"/POSCAR")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:2].zfill(3)+"/"+str(new_name)+".cif")
       commands.getoutput("mv "+str(vp)[0:2].zfill(3)+" ./"+str(satom)+".mol-evol/"+str(vp)[0:2].zfill(3))
     else:
       commands.getoutput("mkdir "+str(vp)[0:3])
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:3]+"/pw.scf.in")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:3]+"/pw.out")
       commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:3]+"/POS.gen")
       commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:3]+"/POSCAR")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:3]+"/"+str(new_name)+".cif")
