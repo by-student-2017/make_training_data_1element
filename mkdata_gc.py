@@ -66,7 +66,7 @@ for t in temp:
   for vp in fractions:
     print "--------------- --------------- ---------------"
     print "          Volume, vp: "+str(vp)
-    a0 = float(vp)**(1.0/3.0)
+    a0 = round(float(vp)**(1.0/3.0),5)
     print "Lattice constant, a0: "+str(a0)
     #
     new_name = str(s)+"_"+str(a0)+"_"+str(t)+"K"
@@ -86,11 +86,13 @@ for t in temp:
     commands.getoutput("sed -i 's/\'pw\'/\'pw_"+str(t)+"K\'/g' pw.scf.in")
     commands.getoutput(pwscf_adress+" < pw.scf.in > pw.out")
     #
-    commands.getoutput(cif2cell_adress+" "+str(new_name)+"  --no-reduce -p dftb -o "+str(new_name)+".gen")
-    commands.getoutput("mv "+str(new_name)+".gen  ./dftb/")
-    commands.getoutput(cif2cell_adress+" "+str(new_name)+"  --no-reduce -p vasp -o "+str(new_name)+".vasp")
-    commands.getoutput("mv "+str(new_name)+".vasp ./poscar/")
-    commands.getoutput("mv "+str(new_name)+".cif  ./cif/")
+    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p vasp")
+    commands.getoutput("cp POSCAR ./poscar/"+str(new_name)+".vasp")
+    #commands.getoutput(cif2cell_adress+" "+str(new_name)+"  --no-reduce -p cellgen -o "+str(new_name)+".gen")
+    #commands.getoutput("mv "+str(new_name)+".gen  ./dftb/")
+    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p xyz -o "+str(new_name)+".xyz")
+    commands.getoutput("cp "+str(new_name)+".xyz  ./dftb/")
+    commands.getoutput("cp "+str(new_name)+".cif  ./cif/")
     #
     commands.getoutput("./pwscf2force > tmp_config_potfit")
     for itw in range(ntemp+1):
@@ -103,35 +105,35 @@ for t in temp:
     toten_per_atom = commands.getoutput("awk '{if($1==\"#E\"){print $2}}' config_potfit")
     natom = commands.getoutput("awk '{if($1==\"#N\"){print $2+$3+$4+$5+$6+$7+$8+$9}}' config_potfit")
     commands.getoutput("rm -f -r tmp_config_potfit config_potfit")
-    toten = float(toten_per_atom) * float(natom)
+    toten = round(float(toten_per_atom) * float(natom),4)
     print "    Total energy, TE: "+str(toten)+" [eV]"
     commands.getoutput("echo "+str(toten)+"  "+str(vp)+" >> toten-"+str(satom)+".ml.dat")
     #
     vp = float(vp)*100.0
     if (vp < 10.0):
       commands.getoutput("mkdir "+str(vp)[0:1].zfill(3))
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:1].zfill(3)+"/pw.scf.in")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:1].zfill(3)+"/pw.out")
-      commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:1].zfill(3)+"/POS.gen")
-      commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:1].zfill(3)+"/POSCAR")
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:1].zfill(3)+"/")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:1].zfill(3)+"/")
+      commands.getoutput("cp POSCAR ./"+str(vp)[0:1].zfill(3)+"/")
+      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:1].zfill(3)+"/POS.xyz")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:1].zfill(3)+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:1].zfill(3)+" ./"+str(satom)+".mol-evol/"+str(vp)[0:1].zfill(3))
+      commands.getoutput("mv "+str(vp)[0:1].zfill(3)+" ./"+str(satom)+".mol-evol/")
     elif (vp < 100.0):
       commands.getoutput("mkdir "+str(vp)[0:2].zfill(3))
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:2].zfill(3)+"/pw.scf.in")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:2].zfill(3)+"/pw.out")
-      commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:2].zfill(3)+"/POS.gen")
-      commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:2].zfill(3)+"/POSCAR")
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:2].zfill(3)+"/")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:2].zfill(3)+"/")
+      commands.getoutput("cp POSCAR ./"+str(vp)[0:2].zfill(3)+"/")
+      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:2].zfill(3)+"/POS.xyz")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:2].zfill(3)+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:2].zfill(3)+" ./"+str(satom)+".mol-evol/"+str(vp)[0:2].zfill(3))
+      commands.getoutput("mv "+str(vp)[0:2].zfill(3)+" ./"+str(satom)+".mol-evol/")
     else:
       commands.getoutput("mkdir "+str(vp)[0:3])
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:3]+"/pw.scf.in")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:3]+"/pw.out")
-      commands.getoutput("cp "+str(new_name)+".gen  ./"+str(vp)[0:3]+"/POS.gen")
-      commands.getoutput("cp "+str(new_name)+".vasp  ./"+str(vp)[0:3]+"/POSCAR")
+      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:3]+"/")
+      commands.getoutput("cp pw.out ./"+str(vp)[0:3]+"/")
+      commands.getoutput("cp POSCAR ./"+str(vp)[0:3]+"/")
+      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:3]+"/POS.xyz")
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:3]+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:3]+" ./"+str(satom)+".mol-evol/"+str(vp)[0:3])
+      commands.getoutput("mv "+str(vp)[0:3]+" ./"+str(satom)+".mol-evol/")
     #
   commands.getoutput("mv "+str(satom)+".mol-evol ./skpar/template/")
   commands.getoutput("mv toten-"+str(satom)+".ml.dat ./skpar/refdata/")
