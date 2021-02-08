@@ -133,7 +133,7 @@ for t in temp:
       commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:3]+"/"+str(new_name)+".cif")
       commands.getoutput("mv "+str(vp)[0:3]+" ./"+str(satom)+".mol-evol/"+str(vp)[0:3])
     #
-  commands.getoutput("mv "+str(satom)+".ml-evol ./skpar/template/")
+  commands.getoutput("mv "+str(satom)+".mol-evol ./skpar/template/")
   commands.getoutput("mv toten-"+str(satom)+".ml.dat ./skpar/refdata/")
   commands.getoutput("mv skpar skpar_"+str(t)+"K")
   commands.getoutput("mkdir skpar")
