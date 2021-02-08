@@ -73,6 +73,7 @@
 	!git clone https://github.com/by-student-2017/make_training_data_1element.git
 	%cd /content/make_training_data_1element
 
+
 ## Run
 	import os
 	os.environ["OMP_NUM_THREADS"] = "1,1"
@@ -81,6 +82,19 @@
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
 	!cat config_potfit*
+
+
+# get data
+	!mkdir Si
+	!cp -r config_potfit_Si_298.0K ./Si/
+	!cp -r skpar_298.0K ./Si/
+	!cp -r Si.mol-evol ./Si/
+	!cp -r dftb ./Si/
+	!cp -r poscar ./Si/
+	!cp -r cif ./Si/
+	!zip -r Si.zip Si
+	from google.colab import files
+	files.download("Si.zip")
 
 
 # Google Colaboratory
@@ -130,6 +144,6 @@
 	!cp -r dftb ./Si/
 	!cp -r poscar ./Si/
 	!cp -r cif ./Si/
-	!zip -r Si.zip /Si
+	!zip -r Si.zip Si
 	from google.colab import files
 	files.download("Si.zip")
