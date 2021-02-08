@@ -122,3 +122,14 @@
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
 	!cat config_potfit*
+	
+	!mkdir Si
+	!cp -r config_potfit_Si_298.0K ./Si/
+	!cp -r skpar_298.0K ./Si/
+	!cp -r Si.mol-evol ./Si/
+	!cp -r dftb ./Si/
+	!cp -r poscar ./Si/
+	!cp -r cif ./Si/
+	!zip -r Si.zip /Si
+	from google.colab import files
+	files.download("Si.zip")
