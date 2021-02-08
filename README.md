@@ -74,6 +74,9 @@
 	%cd /content/make_training_data_1element
 
 ## Run
+	import os
+	os.environ["OMP_NUM_THREADS"] = "1,1"
+	os.environ["MKL_NUM_THREADS"] = "1"
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
@@ -112,6 +115,9 @@
 	!git clone https://github.com/by-student-2017/make_training_data_1element.git
 	%cd /content/make_training_data_1element
 	
+	import os
+	os.environ["OMP_NUM_THREADS"] = "1,1"
+	os.environ["MKL_NUM_THREADS"] = "1"
 	!cp element.input_tmp element.input
 	!sed -i 's/Xx/Si/g' element.input
 	!python2 mkdata_gc.py
