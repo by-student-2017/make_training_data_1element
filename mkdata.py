@@ -2,7 +2,7 @@ import numpy as np
 import commands
 import sys
 #----------------------------------------------------------------------
-satom = "Si"
+satom = commands.getoutput("cat element.input")
 
 cif2cell_adress = "cif2cell"
 
@@ -10,8 +10,8 @@ commands.getoutput("setenv OMP_NUM_THREADS 1")
 num_core = commands.getoutput("grep 'core id' /proc/cpuinfo | sort -u | wc -l")
 
 #pwscf_adress = "mpirun -np "+str(num_core)+" --allow-run-as-root pw.x"
-#pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
-pwscf_adress = "mpirun -np 1 pw.x"
+pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
+#pwscf_adress = "mpirun -np 1 pw.x"
 
 commands.getoutput("chmod +x pwscf2force")
 commands.getoutput("mkdir work")
@@ -64,6 +64,7 @@ for t in temp:
   r6 = np.arange(2.95, 5.65, 0.27) # ultra long distance
   fractions = np.hstack((r1, r2, r3, r4, r5, r6))
   for vp in fractions:
+    print "--------------- --------------- ---------------"
     print "          Volume, vp: "+str(vp)
     a0 = float(vp)**(1.0/3.0)
     print "Lattice constant, a0: "+str(a0)
