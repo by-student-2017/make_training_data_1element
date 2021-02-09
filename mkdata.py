@@ -15,18 +15,10 @@ pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
 
 commands.getoutput("chmod +x pwscf2force")
 commands.getoutput("mkdir work")
-commands.getoutput("mkdir dftb")
-commands.getoutput("mkdir poscar")
-commands.getoutput("mkdir cif")
-#
-# skpar
-commands.getoutput("mkdir skpar")
-commands.getoutput("mkdir refdata")
-commands.getoutput("mv refdata ./skpar/refdata")
-commands.getoutput("mkdir template")
-commands.getoutput("mv template ./skpar/template")
-commands.getoutput("mkdir "+str(satom)+".mol-evol")
-commands.getoutput("echo \"# Energy [eV], Volume tag\" > toten-"+str(satom)+".ml.dat")
+commands.getoutput("mkdir -p results/poscar")
+commands.getoutput("mkdir -p results/dftb")
+commands.getoutput("mkdir -p results/cif")
+commands.getoutput("mkdir -p results/potfit")
 
 print "use struct.dat"
 struct = commands.getoutput("awk '{if($1==\""+str(satom)+"\"){print $0}}' struct.dat")
@@ -53,6 +45,11 @@ print "weight     : ",weig
 dim = len(temp)
 #----------------------------------------------------------------------
 for t in temp:
+  commands.getoutput("mkdir -p results/dftb_"+str(t)+"K")
+  commands.getoutput("mkdir -p results/skpar_"+str(t)+"K/refdata")
+  commands.getoutput("mkdir -p results/skpar_"+str(t)+"K/template")
+  commands.getoutput("mkdir -p results/skpar_"+str(t)+"K/template/"+str(satom)+".mol-evol")
+  commands.getoutput("echo \"# Energy [eV], Volume tag\" > toten-"+str(satom)+".ml.dat")
   print "---------------"
   print "Temperature: "+str(t)+" [K]"
   # Different fractions we will multiply the 'a0' lattice constant with:
@@ -66,10 +63,11 @@ for t in temp:
   for vp in fractions:
     print "--------------- --------------- ---------------"
     print "          Volume, vp: "+str(vp)
-    a0 = round(float(vp)**(1.0/3.0),5)
+    #a0 = round(float(vp)**(1.0/3.0),5)
+    a0 = float(vp)**(1.0/3.0)
     print "Lattice constant, a0: "+str(a0)
     #
-    new_name = str(s)+"_"+str(a0)+"_"+str(t)+"K"
+    new_name = str(s)+"_v"+str(vp)+"_"+str(t)+"K"
     commands.getoutput("cp "+str(s)+"_"+str(t)+"K.cif"+" "+str(new_name)+".cif")
     #
     commands.getoutput("awk '{if($1==\"_cell_length_a\"){printf \"%s  %10.8f \\n\",$1,$2*"+str(a0)+"}else{print $0}}' "+str(new_name)+".cif > tmp1")
@@ -87,12 +85,12 @@ for t in temp:
     commands.getoutput(pwscf_adress+" < pw.scf.in > pw.out")
     #
     commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p vasp")
-    commands.getoutput("cp POSCAR ./poscar/"+str(new_name)+".vasp")
+    commands.getoutput("cp POSCAR ./results/poscar/"+str(new_name)+".vasp")
     #commands.getoutput(cif2cell_adress+" "+str(new_name)+"  --no-reduce -p cellgen -o "+str(new_name)+".gen")
     #commands.getoutput("mv "+str(new_name)+".gen  ./dftb/")
-    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p xyz -o "+str(new_name)+".xyz")
-    commands.getoutput("cp "+str(new_name)+".xyz  ./dftb/")
-    commands.getoutput("cp "+str(new_name)+".cif  ./cif/")
+    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p xyz -o POS.xyz")
+    commands.getoutput("cp POS.xyz  ./results/dftb/"+str(new_name)+".xyz")
+    commands.getoutput("cp "+str(new_name)+".cif  ./results/cif/")
     #
     commands.getoutput("./pwscf2force > tmp_config_potfit")
     for itw in range(ntemp+1):
@@ -105,44 +103,27 @@ for t in temp:
     toten_per_atom = commands.getoutput("awk '{if($1==\"#E\"){print $2}}' config_potfit")
     natom = commands.getoutput("awk '{if($1==\"#N\"){print $2+$3+$4+$5+$6+$7+$8+$9}}' config_potfit")
     commands.getoutput("rm -f -r tmp_config_potfit config_potfit")
-    toten = round(float(toten_per_atom) * float(natom),4)
+    #toten = round(float(toten_per_atom) * float(natom),4)
+    toten = float(toten_per_atom) * float(natom)
     print "    Total energy, TE: "+str(toten)+" [eV]"
     commands.getoutput("echo "+str(toten)+"  "+str(vp)+" >> toten-"+str(satom)+".ml.dat")
     #
     vp = float(vp)*100.0
     if (vp < 10.0):
-      commands.getoutput("mkdir "+str(vp)[0:1].zfill(3))
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:1].zfill(3)+"/")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:1].zfill(3)+"/")
-      commands.getoutput("cp POSCAR ./"+str(vp)[0:1].zfill(3)+"/")
-      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:1].zfill(3)+"/POS.xyz")
-      commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:1].zfill(3)+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:1].zfill(3)+" ./"+str(satom)+".mol-evol/")
+      storage = "./results/skpar_"+str(t)+"K/template/"+str(satom)+".mol-evol/"+str(vp)[0:1].zfill(3)
     elif (vp < 100.0):
-      commands.getoutput("mkdir "+str(vp)[0:2].zfill(3))
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:2].zfill(3)+"/")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:2].zfill(3)+"/")
-      commands.getoutput("cp POSCAR ./"+str(vp)[0:2].zfill(3)+"/")
-      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:2].zfill(3)+"/POS.xyz")
-      commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:2].zfill(3)+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:2].zfill(3)+" ./"+str(satom)+".mol-evol/")
+      storage = "./results/skpar_"+str(t)+"K/template/"+str(satom)+".mol-evol/"+str(vp)[0:2].zfill(3)
     else:
-      commands.getoutput("mkdir "+str(vp)[0:3])
-      commands.getoutput("cp pw.scf.in ./"+str(vp)[0:3]+"/")
-      commands.getoutput("cp pw.out ./"+str(vp)[0:3]+"/")
-      commands.getoutput("cp POSCAR ./"+str(vp)[0:3]+"/")
-      commands.getoutput("cp "+str(new_name)+".xyz  ./"+str(vp)[0:3]+"/POS.xyz")
-      commands.getoutput("cp "+str(new_name)+".cif  ./"+str(vp)[0:3]+"/"+str(new_name)+".cif")
-      commands.getoutput("mv "+str(vp)[0:3]+" ./"+str(satom)+".mol-evol/")
-    #
-  commands.getoutput("mv "+str(satom)+".mol-evol ./skpar/template/")
-  commands.getoutput("mv toten-"+str(satom)+".ml.dat ./skpar/refdata/")
-  commands.getoutput("mv skpar skpar_"+str(t)+"K")
-  commands.getoutput("mkdir skpar")
-  commands.getoutput("mkdir refdata")
-  commands.getoutput("mv refdata ./skpar/refdata")
-  commands.getoutput("mkdir template")
-  commands.getoutput("mv template ./skpar/template")
-  commands.getoutput("mv toten-"+str(satom)+".ml.dat ./dftb/")
-  commands.getoutput("mv dftb dftb_"+str(t)+"K")
-  commands.getoutput("mkdir dftb")
+      storage = "./results/skpar_"+str(t)+"K/template/"+str(satom)+".mol-evol/"+str(vp)[0:3]
+    commands.getoutput("mkdir -p "+str(storage))
+    commands.getoutput("mv pw.scf.in ./"+str(storage)+"/pw.scf.in")
+    commands.getoutput("mv pw.out ./"+str(storage)+"/pw.out")
+    commands.getoutput("mv POSCAR ./"+str(storage)+"/POSCAR")
+    commands.getoutput("mv POS.xyz  ./"+str(storage)+"/POS.xyz")
+    commands.getoutput("mv "+str(new_name)+".cif  ./"+str(storage)+"/input.cif")
+  commands.getoutput("cp toten-"+str(satom)+".ml.dat ./results/skpar_"+str(t)+"K/refdata/toten-"+str(satom)+".ml.dat")
+  commands.getoutput("mv toten-"+str(satom)+".ml.dat ./results/dftb_"+str(t)+"K/toten-"+str(satom)+".ml.dat")
+  commands.getoutput("mv "+str(satom)+"_"+str(t)+"K.cif ./results/dftb_"+str(t)+"K/"+str(satom)+"_"+str(t)+"K.cif")
+  commands.getoutput("mv config_potfit_"+str(satom)+"_"+str(t)+"K ./results/potfit/config_potfit_"+str(satom)+"_"+str(t)+"K")
+commands.getoutput("rm -f -r tmp.scf.in tmp.out")
+commands.getoutput("rm -f -r work")
