@@ -62,10 +62,10 @@ for t in temp:
   fractions = np.hstack((r1, r2, r3, r4, r5, r6))
   for vp in fractions:
     print "--------------- --------------- ---------------"
-    print "          Volume, vp: "+str(vp)
+    print "          Volume, vp: "+str(vp)+" [%/100]"
     #a0 = round(float(vp)**(1.0/3.0),5)
     a0 = float(vp)**(1.0/3.0)
-    print "Lattice constant, a0: "+str(a0)
+    print "Lattice constant, a0: "+str(a0)+" [%/100]"
     #
     new_name = str(s)+"_v"+str(vp)+"_"+str(t)+"K"
     commands.getoutput("cp "+str(s)+"_"+str(t)+"K.cif"+" "+str(new_name)+".cif")
