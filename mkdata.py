@@ -10,8 +10,8 @@ commands.getoutput("setenv OMP_NUM_THREADS 1")
 num_core = commands.getoutput("grep 'core id' /proc/cpuinfo | sort -u | wc -l")
 
 #pwscf_adress = "mpirun -np "+str(num_core)+" --allow-run-as-root pw.x"
-pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
-#pwscf_adress = "mpirun -np 1 pw.x"
+#pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
+pwscf_adress = "mpirun -np 1 pw.x"
 
 commands.getoutput("chmod +x pwscf2force")
 commands.getoutput("mkdir work")
@@ -19,6 +19,7 @@ commands.getoutput("mkdir -p results/poscar")
 commands.getoutput("mkdir -p results/dftb")
 commands.getoutput("mkdir -p results/cif")
 commands.getoutput("mkdir -p results/potfit")
+commands.getoutput("mkdir -p results/MPCv4")
 
 print "use struct.dat"
 struct = commands.getoutput("awk '{if($1==\""+str(satom)+"\"){print $0}}' struct.dat")
@@ -50,6 +51,7 @@ for t in temp:
   commands.getoutput("mkdir -p results/skpar_"+str(t)+"K/template")
   commands.getoutput("mkdir -p results/skpar_"+str(t)+"K/template/"+str(satom)+".mol-evol")
   commands.getoutput("echo \"# Energy [eV], Volume tag\" > toten-"+str(satom)+".ml.dat")
+  commands.getoutput("echo \"lattice constant A (Angstrom) | total energy (eV)\" > "+str(satom)+"-DFT")
   print "---------------"
   print "Temperature: "+str(t)+" [K]"
   # Different fractions we will multiply the 'a0' lattice constant with:
@@ -96,6 +98,7 @@ for t in temp:
     for itw in range(ntemp+1):
       if t == temp[itw]:
         wt = weig[itw]
+        st = stru[itw]
     print "          weight, wt: "+str(wt)
     commands.getoutput("awk '{if($1==\"#W\"){print $1 $2*"+str(wt)+"}else{print $0}}' tmp_config_potfit > config_potfit")
     commands.getoutput("cat config_potfit >> config_potfit_"+str(satom)+"_"+str(t)+"K")
@@ -107,6 +110,8 @@ for t in temp:
     toten = float(toten_per_atom) * float(natom)
     print "    Total energy, TE: "+str(toten)+" [eV]"
     commands.getoutput("echo "+str(toten)+"  "+str(vp)+" >> toten-"+str(satom)+".ml.dat")
+    La = commands.getoutput("awk '{if($1==\"_cell_length_a\"){printf \"%10.8f\",$2*"+str(a0)+"}}' "+str(new_name)+".cif")
+    commands.getoutput("echo "+str(La)+"  "+str(toten)+" >> "+str(satom)+"-DFT")
     #
     vp = float(vp)*100.0
     if (vp < 10.0):
@@ -125,5 +130,6 @@ for t in temp:
   commands.getoutput("mv toten-"+str(satom)+".ml.dat ./results/dftb_"+str(t)+"K/toten-"+str(satom)+".ml.dat")
   commands.getoutput("mv "+str(satom)+"_"+str(t)+"K.cif ./results/dftb_"+str(t)+"K/"+str(satom)+"_"+str(t)+"K.cif")
   commands.getoutput("mv config_potfit_"+str(satom)+"_"+str(t)+"K ./results/potfit/config_potfit_"+str(satom)+"_"+str(t)+"K")
+  commands.getoutput("mv "+str(satom)+"-DFT ./results/MPCv4/"+str(satom)+"_"+str(st)+"_"+str(t)+"K"+"-DFT")
 commands.getoutput("rm -f -r tmp.scf.in tmp.out")
 commands.getoutput("rm -f -r work")
