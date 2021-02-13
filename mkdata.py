@@ -10,8 +10,8 @@ commands.getoutput("setenv OMP_NUM_THREADS 1")
 num_core = commands.getoutput("grep 'core id' /proc/cpuinfo | sort -u | wc -l")
 
 #pwscf_adress = "mpirun -np "+str(num_core)+" --allow-run-as-root pw.x"
-#pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
-pwscf_adress = "mpirun -np 1 pw.x"
+pwscf_adress = "mpirun -np "+str(num_core)+" pw.x"
+#pwscf_adress = "mpirun -np 1 pw.x"
 
 commands.getoutput("chmod +x pwscf2force")
 commands.getoutput("mkdir work")
@@ -90,8 +90,8 @@ for t in temp:
     commands.getoutput("cp POSCAR ./results/poscar/"+str(new_name)+".vasp")
     #commands.getoutput(cif2cell_adress+" "+str(new_name)+"  --no-reduce -p cellgen -o "+str(new_name)+".gen")
     #commands.getoutput("mv "+str(new_name)+".gen  ./dftb/")
-    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p xyz -o POS.xyz")
-    commands.getoutput("cp POS.xyz  ./results/dftb/"+str(new_name)+".xyz")
+    commands.getoutput(cif2cell_adress+" "+str(new_name)+".cif  --no-reduce -p dftb -o POS.gen")
+    commands.getoutput("cp POS.gen  ./results/dftb/"+str(new_name)+".gen")
     commands.getoutput("cp "+str(new_name)+".cif  ./results/cif/")
     #
     commands.getoutput("./pwscf2force > tmp_config_potfit")
@@ -124,7 +124,7 @@ for t in temp:
     commands.getoutput("mv pw.scf.in ./"+str(storage)+"/pw.scf.in")
     commands.getoutput("mv pw.out ./"+str(storage)+"/pw.out")
     commands.getoutput("mv POSCAR ./"+str(storage)+"/POSCAR")
-    commands.getoutput("mv POS.xyz  ./"+str(storage)+"/POS.xyz")
+    commands.getoutput("mv POS.gen  ./"+str(storage)+"/POS.gen")
     commands.getoutput("mv "+str(new_name)+".cif  ./"+str(storage)+"/input.cif")
   commands.getoutput("cp toten-"+str(satom)+".ml.dat ./results/skpar_"+str(t)+"K/refdata/toten-"+str(satom)+".ml.dat")
   commands.getoutput("mv toten-"+str(satom)+".ml.dat ./results/dftb_"+str(t)+"K/toten-"+str(satom)+".ml.dat")
